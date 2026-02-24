@@ -1,0 +1,252 @@
+# API Specification: Chat Endpoint
+
+## Endpoint
+`POST /api/ai/chat`
+
+## OpenAPI Specification
+```yaml
+openapi: 3.0.0
+info:
+  title: AI Chat API
+  version: 1.0.0
+  description: AI-powered chat assistant for blog interactions
+
+paths:
+  /api/ai/chat:
+    post:
+      summary: Send chat message and receive AI response
+      description: Processes user messages and generates AI responses using OpenAI
+      operationId: sendChatMessage
+      tags:
+        - AI
+        - Chat
+      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - messages
+              properties:
+                messages:
+                  type: array
+                  description: Array of chat messages forming the conversation
+                  minItems: 1
+                  maxItems: 20
+                  items:
+                    $ref: '#/components/schemas/ChatMessage'
+              example:
+                messages:
+                  - id: "1"
+                    role: "user"
+                    content: "What topics does this blog cover?"
+                    timestamp: "2024-01-15T10:30:00Z"
+      
+      responses:
+        '200':
+          description: Successful response with AI-generated message
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    description: AI-generated response
+                  usage:
+                    $ref: '#/components/schemas/TokenUsage'
+              example:
+                message: "This blog covers topics in web development, AI, and software engineering."
+                usage:
+                  prompt_tokens: 45
+                  completion_tokens: 25
+                  total_tokens: 70
+        
+        '400':
+          description: Bad request - Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Invalid messages format"
+        
+        '429':
+          description: Too many requests - Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Rate limit exceeded. Please try again later."
+        
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Failed to generate response"
+
+components:
+  schemas:
+    ChatMessage:
+      type: object
+      required:
+        - id
+        - role
+        - content
+        - timestamp
+      properties:
+        id:
+          type: string
+          description: Unique message identifier
+        role:
+          type: string
+          enum: [user, assistant]
+          description: Message sender role
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: Message content
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp
+    
+    TokenUsage:
+      type: object
+      properties:
+        prompt_tokens:
+          type: integer
+          description: Number of tokens in the prompt
+        completion_tokens:
+          type: integer
+          description: Number of tokens in the completion
+        total_tokens:
+          type: integer
+          description: Total tokens used
+    
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+```
+
+## Validation Rules
+- Messages array must contain at least 1 message
+- Messages array must not exceed 20 messages
+- Each message content must be 1-2000 characters
+- Role must be either 'user' or 'assistant'
+- Timestamp must be valid ISO 8601 format
+
+## Rate Limiting
+- 30 requests per minute per IP address
+- 500 requests per hour per IP address
+- Implement exponential backoff for retries
+
+## Response Time SLA
+- P50: < 2 seconds
+- P95: < 5 seconds
+- P99: < 10 seconds
+
+## Security
+- CORS enabled for same-origin requests only
+- Input sanitization for XSS prevention
+- Content length limits enforced
+- API key validation for OpenAI
+
+## Error Codes
+| Code | Description | Action |
+|------|-------------|--------|
+| 400 | Invalid request format | Check request structure |
+| 429 | Rate limit exceeded | Wait and retry with backoff |
+| 500 | Server error | Retry after delay |
+| 503 | Service unavailable | Check OpenAI API status |
+
+## Monitoring Metrics
+- Request count per minute
+- Average response time
+- Error rate by type
+- Token usage statistics
+- OpenAI API availability
+
+## Testing Requirements
+```typescript
+// Test: Should accept valid chat messages
+const validRequest = {
+  messages: [
+    {
+      id: "1",
+      role: "user",
+      content: "Hello",
+      timestamp: new Date().toISOString()
+    }
+  ]
+};
+
+// Test: Should reject invalid role
+const invalidRole = {
+  messages: [{
+    id: "1",
+    role: "admin", // Invalid
+    content: "Hello",
+    timestamp: new Date().toISOString()
+  }]
+};
+
+// Test: Should reject empty content
+const emptyContent = {
+  messages: [{
+    id: "1",
+    role: "user",
+    content: "", // Invalid
+    timestamp: new Date().toISOString()
+  }]
+};
+
+// Test: Should reject too many messages
+const tooMany = {
+  messages: Array(21).fill({}).map((_, i) => ({
+    id: String(i),
+    role: "user",
+    content: "Test",
+    timestamp: new Date().toISOString()
+  }))
+};
+```
+
+## Mock Responses
+```typescript
+// Success response
+{
+  message: "I'd be happy to help! This blog covers...",
+  usage: {
+    prompt_tokens: 50,
+    completion_tokens: 30,
+    total_tokens: 80
+  }
+}
+
+// Error response
+{
+  error: "Failed to generate response"
+}
+```
+
+## Contract Tests
+- Request schema validation
+- Response schema validation
+- Error response format validation
+- Rate limit behavior validation
+- Timeout handling validation
