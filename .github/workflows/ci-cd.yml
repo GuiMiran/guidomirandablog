@@ -105,7 +105,7 @@ jobs:
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
 
   release:
-    needs: deploy
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
@@ -129,7 +129,6 @@ jobs:
       
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: npx semantic-release
 
