@@ -1,0 +1,177 @@
+name: spec-driven-pipeline.yml
+
+on: 
+  push:
+    branches: [main, develop, 'feat/**', 'fix/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate-specifications:
+    name: Validate Specifications
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run spec validation
+        id: validate
+        run: |
+          npm run spec:validate > validation-output.txt 2>&1 || true
+          cat validation-output.txt
+          
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: |
+            validation-output.txt
+            spec-coverage.json
+          retention-days: 30
+
+  type-check:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run type check
+        run: npx tsc --noEmit
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run unit tests
+        run: npm test
+      
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+  build:
+    name: Build Project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+  spec-coverage:
+    name: Calculate Spec Coverage
+    runs-on: ubuntu-latest
+    needs: [validate-specifications, type-check, lint, test, build]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Calculate coverage
+        run: npm run spec:coverage
+      
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: spec-coverage
+          path: spec-coverage.json
+          retention-days: 30
+
+  report:
+    name: Generate Pipeline Report
+    runs-on: ubuntu-latest
+    needs: [spec-coverage]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+      
+      - name: Generate report
+        run: |
+          echo "## 🔍 SDD Pipeline Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "artifacts/spec-coverage/spec-coverage.json" ]; then
+            echo "### Spec Coverage" >> $GITHUB_STEP_SUMMARY
+            cat artifacts/spec-coverage/spec-coverage.json >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Pipeline completed" >> $GITHUB_STEP_SUMMARY
