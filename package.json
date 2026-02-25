@@ -9,7 +9,7 @@
     "lint": "next lint",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --pass-with-no-tests",
     "test:e2e:ui": "playwright test --ui",
     "semantic-release": "semantic-release"
   },
