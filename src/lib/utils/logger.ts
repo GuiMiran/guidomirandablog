@@ -42,7 +42,8 @@ class Logger {
 
   private shouldLog(level: LogLevel): boolean {
     const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    const currentLevelIndex = levels.indexOf(this.minLevel);
+    const currentLevel = (process.env.LOG_LEVEL as LogLevel) || this.minLevel;
+    const currentLevelIndex = levels.indexOf(currentLevel);
     const messageLevelIndex = levels.indexOf(level);
     return messageLevelIndex >= currentLevelIndex;
   }
