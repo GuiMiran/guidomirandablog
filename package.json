@@ -12,7 +12,11 @@
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "spec:validate": "npx tsx scripts/validate-specs.ts",
+    "spec:coverage": "npx tsx scripts/spec-coverage.ts",
+    "spec:check": "npm run spec:validate && npm run spec:coverage",
+    "spec:help": "echo '\n🚀 Spec-Driven Development Commands:\n\n  spec:validate  - Validate implementation vs specifications\n  spec:coverage  - Calculate spec alignment percentage\n  spec:check     - Run all SDD validations\n  spec:help      - Show this help message\n\nFor more info, see docs/SDD-PIPELINE.md\n'"
   },
   "dependencies": {
     "@vercel/analytics": "^1.2.2",
@@ -34,20 +38,18 @@
     "@playwright/test": "^1.44.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-react": "^5.1.4",
     "@vitest/ui": "^1.6.0",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.0",
-    "jsdom": "^28.1.0",
     "postcss": "^8",
     "semantic-release": "^23.1.0",
     "tailwindcss": "^3.4.0",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^1.6.0"
   }
