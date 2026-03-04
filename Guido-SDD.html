@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The New IT Org — SDD Era</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+–bg: #080C10;
+–surface: #0D1117;
+–border: #1C2430;
+–border-bright: #2A3545;
+–text: #C9D1D9;
+–dim: #4A5568;
+–white: #F0F6FC;
+
+``
+--spec: #00B4D8;
+--spec-dim: rgba(0,180,216,0.12);
+--spec-glow: rgba(0,180,216,0.3);
+
+--agent: #F59E0B;
+--agent-dim: rgba(245,158,11,0.12);
+--agent-glow: rgba(245,158,11,0.3);
+
+--quality: #EF4444;
+--quality-dim: rgba(239,68,68,0.12);
+--quality-glow: rgba(239,68,68,0.3);
+
+--platform: #8B5CF6;
+--platform-dim: rgba(139,92,246,0.12);
+--platform-glow: rgba(139,92,246,0.3);
+
+--know: #10B981;
+--know-dim: rgba(16,185,129,0.12);
+--know-glow: rgba(16,185,129,0.3);
+
+--cto: #FF6B6B;
+``
+}
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Syne’, sans-serif;
+min-height: 100vh;
+padding: 40px 20px 60px;
+}
+
+/* HEADER */
+.header {
+text-align: center;
+margin-bottom: 56px;
+animation: fadeDown 0.8s ease forwards;
+}
+.header-label {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+letter-spacing: 4px;
+color: var(–dim);
+text-transform: uppercase;
+margin-bottom: 12px;
+}
+.header-title {
+font-size: 42px;
+font-weight: 800;
+color: var(–white);
+line-height: 1.1;
+margin-bottom: 8px;
+}
+.header-title span { color: var(–cto); }
+.header-sub {
+font-size: 15px;
+color: var(–dim);
+font-family: ‘JetBrains Mono’, monospace;
+letter-spacing: 1px;
+}
+
+@keyframes fadeDown {
+from { opacity: 0; transform: translateY(-20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+/* EVOLUTION STRIP */
+.evolution-strip {
+display: flex;
+align-items: stretch;
+gap: 0;
+margin: 0 auto 56px;
+max-width: 1100px;
+border: 1px solid var(–border);
+border-radius: 12px;
+overflow: hidden;
+animation: fadeUp 0.8s ease 0.2s both;
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.evo-col {
+flex: 1;
+padding: 24px 20px;
+position: relative;
+}
+.evo-col.before { background: #0A0A0A; }
+.evo-col.arrow-col {
+flex: 0 0 48px;
+background: var(–surface);
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 20px;
+color: var(–cto);
+}
+.evo-col.after { background: var(–surface); }
+
+.evo-label {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 10px;
+letter-spacing: 3px;
+text-transform: uppercase;
+margin-bottom: 16px;
+padding-bottom: 10px;
+border-bottom: 1px solid var(–border);
+}
+.evo-label.before { color: var(–dim); }
+.evo-label.after { color: var(–cto); }
+
+.evo-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 10px;
+}
+.evo-old {
+font-size: 13px;
+color: #444;
+text-decoration: line-through;
+text-decoration-color: #333;
+}
+.evo-new {
+font-size: 13px;
+color: var(–white);
+font-weight: 600;
+}
+.evo-tag {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 9px;
+padding: 2px 8px;
+border-radius: 3px;
+letter-spacing: 1px;
+}
+
+/* ORG CHART */
+.org-section {
+max-width: 1200px;
+margin: 0 auto 56px;
+animation: fadeUp 0.8s ease 0.4s both;
+}
+
+.section-label {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+letter-spacing: 4px;
+color: var(–dim);
+text-transform: uppercase;
+margin-bottom: 24px;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+.section-label::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+
+/* CTO Node */
+.cto-row {
+display: flex;
+justify-content: center;
+margin-bottom: 0;
+position: relative;
+}
+.cto-node {
+background: linear-gradient(135deg, #1A0808, #2A0A0A);
+border: 2px solid var(–cto);
+border-radius: 12px;
+padding: 16px 40px;
+text-align: center;
+position: relative;
+box-shadow: 0 0 40px rgba(255,107,107,0.15);
+}
+.cto-node::after {
+content: ‘’;
+position: absolute;
+bottom: -30px;
+left: 50%;
+transform: translateX(-50%);
+width: 2px;
+height: 30px;
+background: var(–cto);
+}
+.cto-title {
+font-size: 11px;
+font-family: ‘JetBrains Mono’, monospace;
+letter-spacing: 3px;
+color: var(–cto);
+text-transform: uppercase;
+margin-bottom: 4px;
+}
+.cto-name {
+font-size: 22px;
+font-weight: 800;
+color: var(–white);
+}
+.cto-sub {
+font-size: 11px;
+color: var(–dim);
+font-family: ‘JetBrains Mono’, monospace;
+margin-top: 4px;
+}
+
+/* HORIZONTAL CONNECTOR */
+.h-connector {
+height: 30px;
+margin: 0 auto;
+position: relative;
+max-width: 1100px;
+}
+.h-connector::before {
+content: ‘’;
+position: absolute;
+top: 0;
+left: calc(50% - 1px);
+width: 2px;
+height: 100%;
+background: var(–border-bright);
+}
+.h-connector.wide::after {
+content: ‘’;
+position: absolute;
+bottom: 0;
+left: 10%;
+right: 10%;
+height: 2px;
+background: var(–border-bright);
+}
+
+/* DEPARTMENTS ROW */
+.depts-row {
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+gap: 16px;
+max-width: 1200px;
+margin: 0 auto;
+}
+
+/* DEPARTMENT CARD */
+.dept {
+border-radius: 12px;
+border: 1px solid var(–border);
+overflow: hidden;
+position: relative;
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+cursor: default;
+}
+.dept:hover {
+transform: translateY(-4px);
+}
+.dept.spec { border-color: rgba(0,180,216,0.4); }
+.dept.spec:hover { box-shadow: 0 8px 30px var(–spec-glow); }
+.dept.agent { border-color: rgba(245,158,11,0.4); }
+.dept.agent:hover { box-shadow: 0 8px 30px var(–agent-glow); }
+.dept.quality { border-color: rgba(239,68,68,0.4); }
+.dept.quality:hover { box-shadow: 0 8px 30px var(–quality-glow); }
+.dept.platform { border-color: rgba(139,92,246,0.4); }
+.dept.platform:hover { box-shadow: 0 8px 30px var(–platform-glow); }
+.dept.know { border-color: rgba(16,185,129,0.4); }
+.dept.know:hover { box-shadow: 0 8px 30px var(–know-glow); }
+
+.dept-header {
+padding: 14px 16px 12px;
+border-bottom: 1px solid var(–border);
+}
+.dept.spec .dept-header { background: var(–spec-dim); }
+.dept.agent .dept-header { background: var(–agent-dim); }
+.dept.quality .dept-header { background: var(–quality-dim); }
+.dept.platform .dept-header { background: var(–platform-dim); }
+.dept.know .dept-header { background: var(–know-dim); }
+
+.dept-icon { font-size: 20px; margin-bottom: 6px; }
+.dept-name {
+font-size: 13px;
+font-weight: 700;
+color: var(–white);
+margin-bottom: 2px;
+}
+.dept.spec .dept-name { color: var(–spec); }
+.dept.agent .dept-name { color: var(–agent); }
+.dept.quality .dept-name { color: var(–quality); }
+.dept.platform .dept-name { color: var(–platform); }
+.dept.know .dept-name { color: var(–know); }
+
+.dept-mission {
+font-size: 10px;
+color: var(–dim);
+font-family: ‘JetBrains Mono’, monospace;
+letter-spacing: 0.5px;
+line-height: 1.5;
+}
+
+dep.body { padding: 12px 16px; background: var(–surface); }
+
+.role-card {
+margin-bottom: 10px;
+padding: 10px 12px;
+border-radius: 8px;
+background: var(–bg);
+border-left: 3px solid;
+position: relative;
+}
+.dept.spec .role-card { border-color: var(–spec); }
+.dept.agent .role-card { border-color: var(–agent);}...

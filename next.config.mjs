@@ -1,12 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
   images: {
     domains: ['firebasestorage.googleapis.com'],
-  },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
+    unoptimized: true,
   },
 };
 
