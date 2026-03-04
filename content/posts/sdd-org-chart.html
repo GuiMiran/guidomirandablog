@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The New IT Org — SDD Era</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #080C10;
+    --surface: #0D1117;
+    --border: #1C2430;
+    --border-bright: #2A3545;
+    --text: #C9D1D9;
+    --dim: #4A5568;
+    --white: #F0F6FC;
+
+    --spec: #00B4D8;
+    --spec-dim: rgba(0,180,216,0.12);
+    --spec-glow: rgba(0,180,216,0.3);
+
+    --agent: #F59E0B;
+    --agent-dim: rgba(245,158,11,0.12);
+    --agent-glow: rgba(245,158,11,0.3);
+
+    --quality: #EF4444;
+    --quality-dim: rgba(239,68,68,0.12);
+    --quality-glow: rgba(239,68,68,0.3);
+
+    --platform: #8B5CF6;
+    --platform-dim: rgba(139,92,246,0.12);
+    --platform-glow: rgba(139,92,246,0.3);
+
+    --know: #10B981;
+    --know-dim: rgba(16,185,129,0.12);
+    --know-glow: rgba(16,185,129,0.3);
+
+    --cto: #FF6B6B;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 60px;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fadeDown 0.8s ease forwards;
+  }
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .header-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .header-title span { color: var(--cto); }
+  .header-sub {
+    font-size: 15px;
+    color: var(--dim);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* EVOLUTION STRIP */
+  .evolution-strip {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 0 auto 56px;
+    max-width: 1100px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .evo-col {
+    flex: 1;
+    padding: 24px 20px;
+    position: relative;
+  }
+  .evo-col.before { background: #0A0A0A; }
+  .evo-col.arrow-col {
+    flex: 0 0 48px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--cto);
+  }
+  .evo-col.after { background: var(--surface); }
+
+  .evo-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .evo-label.before { color: var(--dim); }
+  .evo-label.after { color: var(--cto); }
+
+  .evo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .evo-old {
+    font-size: 13px;
+    color: #444;
+    text-decoration: line-through;
+    text-decoration-color: #333;
+  }
+  .evo-new {
+    font-size: 13px;
+    color: var(--white);
+    font-weight: 600;
+  }
+  .evo-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+  }
+
+  /* ORG CHART */
+  .org-section {
+    max-width: 1200px;
+    margin: 0 auto 56px;
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* CTO Node */
+  .cto-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+    position: relative;
+  }
+  .cto-node {
+    background: linear-gradient(135deg, #1A0808, #2A0A0A);
+    border: 2px solid var(--cto);
+    border-radius: 12px;
+    padding: 16px 40px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 40px rgba(255,107,107,0.15);
+  }
+  .cto-node::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 30px;
+    background: var(--cto);
+  }
+  .cto-title {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 3px;
+    color: var(--cto);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .cto-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--white);
+  }
+  .cto-sub {
+    font-size: 11px;
+    color: var(--dim);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 4px;
+  }
+
+  /* HORIZONTAL CONNECTOR */
+  .h-connector {
+    height: 30px;
+    margin: 0 auto;
+    position: relative;
+    max-width: 1100px;
+  }
+  .h-connector::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(50% - 1px);
+    width: 2px;
+    height: 100%;
+    background: var(--border-bright);
+  }
+  .h-connector.wide::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: var(--border-bright);
+  }
+
+  /* DEPARTMENTS ROW */
+  .depts-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* DEPARTMENT CARD */
+  .dept {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
+  }
+  .dept:hover {
+    transform: translateY(-4px);
+  }
+  .dept.spec { border-color: rgba(0,180,216,0.4); }
+  .dept.spec:hover { box-shadow: 0 8px 30px var(--spec-glow); }
+  .dept.agent { border-color: rgba(245,158,11,0.4); }
+  .dept.agent:hover { box-shadow: 0 8px 30px var(--agent-glow); }
+  .dept.quality { border-color: rgba(239,68,68,0.4); }
+  .dept.quality:hover { box-shadow: 0 8px 30px var(--quality-glow); }
+  .dept.platform { border-color: rgba(139,92,246,0.4); }
+  .dept.platform:hover { box-shadow: 0 8px 30px var(--platform-glow); }
+  .dept.know { border-color: rgba(16,185,129,0.4); }
+  .dept.know:hover { box-shadow: 0 8px 30px var(--know-glow); }
+
+  .dept-header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dept.spec .dept-header { background: var(--spec-dim); }
+  .dept.agent .dept-header { background: var(--agent-dim); }
+  .dept.quality .dept-header { background: var(--quality-dim); }
+  .dept.platform .dept-header { background: var(--platform-dim); }
+  .dept.know .dept-header { background: var(--know-dim); }
+
+  .dept-icon { font-size: 20px; margin-bottom: 6px; }
+  .dept-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 2px;
+  }
+  .dept.spec .dept-name { color: var(--spec); }
+  .dept.agent .dept-name { color: var(--agent); }
+  .dept.quality .dept-name { color: var(--quality); }
+  .dept.platform .dept-name { color: var(--platform); }
+  .dept.know .dept-name { color: var(--know); }
+
+  .dept-mission {
+    font-size: 10px;
+    color: var(--dim);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+  }
+
+  .dept-body { padding: 12px 16px; background: var(--surface); }
+
+  .role-card {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--bg);
+    border-left: 3px solid;
+    position: relative;
+  }
+  .dept.spec .role-card { border-color: var(--spec); }
+  .dept.agent .role-card { border-color: var(--agent); }
+  .dept.quality .role-card { border-color: var(--quality); }
+  .dept.platform .role-card { border-color: var(--platform); }
+  .dept.know .role-card { border-color: var(--know); }
+
+  .role-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 3px;
+  }
+  .role-from {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--dim);
+    margin-bottom: 5px;
+  }
+  .role-from span { color: var(--text); }
+
+  .role-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .tag {
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .tag.senior { background: rgba(239,68,68,0.15); color: #EF4444; }
+  .tag.mid { background: rgba(245,158,11,0.15); color: #F59E0B; }
+  .tag.junior { background: rgba(16,185,129,0.15); color: #10B981; }
+  .tag.hire { background: rgba(139,92,246,0.15); color: #A78BFA; }
+  .tag.grow { background: rgba(0,180,216,0.15); color: #00B4D8; }
+  .tag.critical { background: rgba(239,68,68,0.2); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.3); }
+
+  /* SOURCE OF TRUTH */
+  .truth-bar {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+  .truth-label {
+    color: var(--dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-size: 10px;
+  }
+  .truth-flow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  .truth-node {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .truth-arrow { color: var(--dim); font-size: 14px; }
+
+  /* GUIDO LEVELS */
+  .guido-section {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    animation: fadeUp 0.8s ease 0.6s both;
+  }
+  .guido-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .guido-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .guido-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .g1::before { background: #EF4444; }
+  .g2::before { background: #F97316; }
+  .g3::before { background: #F59E0B; }
+  .g4::before { background: #84CC16; }
+  .g5::before { background: #10B981; }
+
+  .guido-num {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+  .g1 .guido-num { color: #EF4444; }
+  .g2 .guido-num { color: #F97316; }
+  .g3 .guido-num { color: #F59E0B; }
+  .g4 .guido-num { color: #84CC16; }
+  .g5 .guido-num { color: #10B981; }
+
+  .guido-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .guido-signal {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--dim);
+    line-height: 1.5;
+    font-style: italic;
+  }
+  .guido-roles {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .guido-role-tag {
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 3px;
+    color: var(--dim);
+    background: var(--bg);
+    text-align: left;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 2px;
+  }
+  .footer span { color: var(--cto); }
+</style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-label">Specification-Driven Development · Org Design 2026</div>
+    <div class="header-title">The New <span>IT Org</span> in the Age of AI Agents</div>
+    <div class="header-sub">Where do the new profiles fit — and where did they come from?</div>
+  </div>
+
+  <!-- EVOLUTION STRIP -->
+  <div class="evolution-strip">
+    <div class="evo-col before">
+      <div class="evo-label before">Legacy Role</div>
+      <div class="evo-row"><span class="evo-old">Software Architect</span></div>
+      <div class="evo-row"><span class="evo-old">QA Lead / Manager</span></div>
+      <div class="evo-row"><span class="evo-old">SDET / QA Automation</span></div>
+      <div class="evo-row"><span class="evo-old">DevOps / SRE</span></div>
+      <div class="evo-row"><span class="evo-old">Tech Writer / KM</span></div>
+      <div class="evo-row"><span class="evo-old">Senior Developer</span></div>
+      <div class="evo-row"><span class="evo-old">Platform Engineer</span></div>
+    </div>
+    <div class="evo-col arrow-col">⟶</div>
+    <div class="evo-col after">
+      <div class="evo-label after">SDD-Native Role</div>
+      <div class="evo-row"><span class="evo-new">Spec Architect</span> <span class="evo-tag tag grow">Grow</span></div>
+      <div class="evo-row"><span class="evo-new">AI QA Governor</span> <span class="evo-tag tag hire">Hire</span></div>
+      <div class="evo-row"><span class="evo-new">Spec QA Engineer</span> <span class="evo-tag tag grow">Grow</span></div>
+      <div class="evo-row"><span class="evo-new">Agent Orchestrator</span> <span class="evo-tag tag hire">Hire</span></div>
+      <div class="evo-row"><span class="evo-new">Knowledge Curator</span> <span class="evo-tag tag grow">Grow</span></div>
+      <div class="evo-row"><span class="evo-new">Specification Designer</span> <span class="evo-tag tag grow">Grow</span></div>
+      <div class="evo-row"><span class="evo-new">AI Platform Architect</span> <span class="evo-tag tag grow">Grow</span></div>
+    </div>
+  </div>
+
+  <!-- SOURCE OF TRUTH FLOW -->
+  <div class="truth-bar">
+    <div class="truth-label">Flow</div>
+    <div class="truth-flow">
+      <div class="truth-node" style="background:rgba(0,180,216,0.15);color:#00B4D8;">SPEC</div>
+      <div class="truth-arrow">→</div>
+      <div class="truth-node" style="background:rgba(245,158,11,0.15);color:#F59E0B;">AGENTS</div>
+      <div class="truth-arrow">→</div>
+      <div class="truth-node" style="background:rgba(139,92,246,0.15);color:#A78BFA;">CODE + TESTS</div>
+      <div class="truth-arrow">→</div>
+      <div class="truth-node" style="background:rgba(239,68,68,0.15);color:#EF4444;">QA GOVERNOR</div>
+      <div class="truth-arrow">→</div>
+      <div class="truth-node" style="background:rgba(16,185,129,0.15);color:#10B981;">DEPLOY</div>
+      <div class="truth-arrow">→</div>
+      <div class="truth-node" style="background:rgba(0,180,216,0.1);color:#00B4D8;">SPEC UPDATED</div>
+    </div>
+  </div>
+
+  <!-- ORG CHART -->
+  <div class="org-section">
+    <div class="section-label">Org Chart — SDD Native Structure</div>
+
+    <!-- CTO -->
+    <div class="cto-row">
+      <div class="cto-node">
+        <div class="cto-title">Chief Technology Officer</div>
+        <div class="cto-name">CTO</div>
+        <div class="cto-sub">Governs intention · Owns transformation</div>
+      </div>
+    </div>
+
+    <div class="h-connector wide"></div>
+
+    <!-- 5 DEPARTMENTS -->
+    <div class="depts-row">
+
+      <!-- SPEC & DOMAIN -->
+      <div class="dept spec">
+        <div class="dept-header">
+          <div class="dept-icon">📐</div>
+          <div class="dept-name">Spec & Domain</div>
+          <div class="dept-mission">Owns intention.<br>Converts requirements into executable truth.</div>
+        </div>
+        <div class="dept-body">
+          <div class="role-card">
+            <div class="role-name">Spec Architect</div>
+            <div class="role-from">From: <span>Software Architect</span></div>
+            <div class="role-tags">
+              <span class="tag senior">Senior/Staff</span>
+              <span class="tag grow">Grow</span>
+              <span class="tag critical">Critical</span>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-name">Specification Designer</div>
+            <div class="role-from">From: <span>BA / QA Senior / Dev Senior</span></div>
+            <div class="role-tags">
+              <span class="tag mid">Mid/Senior</span>
+              <span class="tag grow">Grow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENT ENGINEERING -->
+      <div class="dept agent">
+        <div class="dept-header">
+          <div class="dept-icon">⚙️</div>
+          <div class="dept-name">Agent Engineering</div>
+          <div class="dept-mission">Designs & runs the pipeline.<br>Turns specs into deployed software.</div>
+        </div>
+        <div class="dept-body">
+          <div class="role-card">
+            <div class="role-name">Agent Orchestrator</div>
+            <div class="role-from">From: <span>Platform / DevOps Senior</span></div>
+            <div class="role-tags">
+              <span class="tag senior">Senior</span>
+              <span class="tag hire">Hire</span>
+              <span class="tag critical">Critical</span>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-name">AI Agent Developer</div>
+            <div class="role-from">From: <span>AI/Software Engineer</span></div>
+            <div class="role-tags">
+              <span class="tag mid">Mid/Senior</span>
+              <span class="tag grow">Mixed</span>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-name">Agent Operator</div>
+            <div class="role-from">From: <span>DevOps / SRE Junior</span></div>
+            <div class="role-tags">
+              <span class="tag junior">Junior/Mid</span>
+              <span class="tag grow">Grow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUALITY & RISK -->
+      <div class="dept quality">
+        <div class="dept-header">
+          <div class="dept-icon">🛡️</div>
+          <div class="dept-name">Quality & Risk</div>
+          <div class="dept-mission">Decides what can be trusted.<br>Governs agent output at scale.</div>
+        </div>
+        <div class="dept-body">
+          <div class="role-card">
+            <div class="role-name">AI QA Governor</div>
+            <div class="role-from">From: <span>QA Lead / AppSec / SRE</span></div>
+            <div class="role-tags">
+              <span class="tag senior">Sr/Principal</span>
+              <span class="tag hire">Hire</span>
+              <span class="tag critical">Critical</span>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-name">Spec QA Engineer</div>
+            <div class="role-from">From: <span>SDET / QA Automation</span></div>
+            <div class="role-tags">
+              <span class="tag mid">Mid/Senior</span>
+              <span class="tag grow">Grow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLATFORM -->
+      <div class="dept platform">
+        <div class="dept-header">
+          <div class="dept-icon">🏗️</div>
+          <div class="dept-name">AI Platform</div>
+          <div class="dept-mission">Makes agents safe by default.<br>Infrastructure that cannot be trusted = liability.</div>
+        </div>
+        <div class="dept-body">
+          <div class="role-card">
+            <div class="role-name">AI Platform Architect</div>
+            <div class="role-from">From: <span>Platform / Cloud / Security</span></div>
+            <div class="role-tags">
+              <span class="tag senior">Senior</span>
+              <span class="tag grow">Grow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KNOWLEDGE -->
+      <div class="dept know">
+        <div class="dept-header">
+          <div class="dept-icon">🧠</div>
+          <div class="dept-name">Knowledge</div>
+          <div class="dept-mission">Maintains the memory of intention.<br>Decayed specs = unreliable agents.</div>
+        </div>
+        <div class="dept-body">
+          <div class="role-card">
+            <div class="role-name">Knowledge Curator</div>
+            <div class="role-from">From: <span>Tech Writer / KM / Dev Rel</span></div>
+            <div class="role-tags">
+              <span class="tag mid">Mid</span>
+              <span class="tag grow">Grow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- GUIDO LEVELS -->
+  <div class="guido-section">
+    <div class="section-label">GUIDO Scale — Which roles unlock at each level</div>
+    <div class="guido-row">
+      <div class="guido-card g1">
+        <div class="guido-num">1</div>
+        <div class="guido-name">Chaotic</div>
+        <div class="guido-signal">"We figure it out as we go"</div>
+        <div class="guido-roles">
+          <div class="guido-role-tag">No SDD roles yet</div>
+          <div class="guido-role-tag">→ Hire Spec Architect first</div>
+          <div class="guido-role-tag" style="color:#EF4444">Effort: Very High</div>
+        </div>
+      </div>
+      <div class="guido-card g2">
+        <div class="guido-num">2</div>
+        <div class="guido-name">Directed</div>
+        <div class="guido-signal">"Each team does it differently"</div>
+        <div class="guido-roles">
+          <div class="guido-role-tag">+ Spec Architect</div>
+          <div class="guido-role-tag">+ Specification Designer</div>
+          <div class="guido-role-tag" style="color:#F97316">Effort: High</div>
+        </div>
+      </div>
+      <div class="guido-card g3">
+        <div class="guido-num">3</div>
+        <div class="guido-name">Defined</div>
+        <div class="guido-signal">"Standards exist and are followed"</div>
+        <div class="guido-roles">
+          <div class="guido-role-tag">+ Agent Orchestrator</div>
+          <div class="guido-role-tag">+ AI QA Governor</div>
+          <div class="guido-role-tag">+ AI Platform Architect</div>
+          <div class="guido-role-tag" style="color:#F59E0B">Effort: Moderate</div>
+        </div>
+      </div>
+      <div class="guido-card g4">
+        <div class="guido-num">4</div>
+        <div class="guido-name">Managed</div>
+        <div class="guido-signal">"We measure everything"</div>
+        <div class="guido-roles">
+          <div class="guido-role-tag">+ AI Agent Developer</div>
+          <div class="guido-role-tag">+ Spec QA Engineer</div>
+          <div class="guido-role-tag">+ Knowledge Curator</div>
+          <div class="guido-role-tag" style="color:#84CC16">Effort: Low</div>
+        </div>
+      </div>
+      <div class="guido-card g5">
+        <div class="guido-num">5</div>
+        <div class="guido-name">SDD-Native</div>
+        <div class="guido-signal">"Specs drive the system"</div>
+        <div class="guido-roles">
+          <div class="guido-role-tag">+ Agent Operators (scale)</div>
+          <div class="guido-role-tag">Full pipeline autonomous</div>
+          <div class="guido-role-tag" style="color:#10B981">Effort: Minimal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    GUIDO Scale · Specification-Driven Development · <span>Guido Miranda Mercado · 2026</span><br>
+    github.com/GuiMiran/guido-sdd-migration-effort-scale
+  </div>
+
+</body>
+</html>
