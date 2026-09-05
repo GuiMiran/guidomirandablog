@@ -1,3 +1,17 @@
+# 1.0.0 (2026-09-05)
+
+
+### Bug Fixes
+
+* ensure release and tag are always generated on main merge ([#12](https://github.com/GuiMiran/guidomirandablog/issues/12)) ([d0ec378](https://github.com/GuiMiran/guidomirandablog/commit/d0ec378e01709dc25f58b80cf37aca03901266b5))
+* repair broken CI/CD pipeline — missing E2E tests, hanging vitest, missing env vars ([#3](https://github.com/GuiMiran/guidomirandablog/issues/3)) ([7b0b3ad](https://github.com/GuiMiran/guidomirandablog/commit/7b0b3adb3abf9a1d171b4d0d154cafca2f2b3dbf))
+* resolve failing unit tests — logger dynamic log level, missing testing deps, vitest JSX/jsdom config ([#8](https://github.com/GuiMiran/guidomirandablog/issues/8)) ([b8f22ce](https://github.com/GuiMiran/guidomirandablog/commit/b8f22ceb1e2988f62beac280edaa2b0a0f55f859))
+
+
+### Features
+
+* Implement complete SDD pipeline and reach 100% spec alignment ([98845ef](https://github.com/GuiMiran/guidomirandablog/commit/98845ef0223e6b2cd12d98d9ed0203418c9aabe0))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
