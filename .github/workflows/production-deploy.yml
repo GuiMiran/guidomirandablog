@@ -1,0 +1,268 @@
+name: Production Release and Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-and-test:
+    name: Validate and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run type check
+        run: npx tsc --noEmit
+      
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Run unit tests
+        run: npm run test
+      
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      
+      - name: Run E2E tests
+        run: npm run test:e2e
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-test-results
+          path: |
+            playwright-report/
+            coverage/
+          retention-days: 30
+
+  build-production:
+    name: Build for Production
+    needs: validate-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      
+      - name: Analyze build size
+        run: |
+          echo "📦 Production Build Analysis:"
+          du -sh .next
+          du -sh .next/static
+          echo "---"
+          ls -lah .next/static
+      
+      - name: Upload production build
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: |
+            .next/
+            public/
+            package.json
+            next.config.mjs
+          retention-days: 30
+
+  deploy-production:
+    name: Deploy to Firebase Production
+    needs: build-production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Download production build
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+      
+      - name: Deploy to Firebase Hosting
+        id: firebase_deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
+      
+      - name: Deployment Summary
+        run: |
+          echo "✅ Successfully deployed to production!"
+          echo "🌐 Live URL: ${{ steps.firebase_deploy.outputs.url }}"
+
+  create-production-release:
+    name: Create Production Release
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Create Release with semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release
+      
+      - name: Get release version
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Create deployment record
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `
+            ## 🚀 Production Deployment Successful
+            
+            **Version:** ${{ steps.get_version.outputs.version }}
+            **Environment:** Production
+            **Deployed to:** Firebase Hosting
+            **Time:** ${new Date().toISOString()}
+            
+            ### 📊 Deployment Details
+            - Build completed successfully
+            - All tests passed
+            - Live on Firebase Hosting
+            
+            ### 🔗 Links
+            - Production URL: https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app
+            - Release Notes: Check GitHub Releases
+            `;
+            
+            await core.summary
+              .addRaw(summary)
+              .write();
+
+  post-deploy-verification:
+    name: Post-Deploy Verification
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Wait for deployment to be live
+        run: sleep 30
+      
+      - name: Health check
+        run: |
+          URL="https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app"
+          echo "Checking $URL..."
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" $URL)
+          
+          if [ $STATUS -eq 200 ]; then
+            echo "✅ Site is live and responding!"
+          else
+            echo "❌ Site returned status code: $STATUS"
+            exit 1
+          fi
+      
+      - name: Run smoke tests
+        run: npm run test:e2e
+        continue-on-error: true
+        env:
+          BASE_URL: https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app
+
+  notify-team:
+    name: Notify Team
+    needs: [deploy-production, create-production-release, post-deploy-verification]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check deployment status
+        id: status
+        run: |
+          if [ "${{ needs.deploy-production.result }}" == "success" ] && \
+             [ "${{ needs.create-production-release.result }}" == "success" ]; then
+            echo "status=✅ SUCCESS" >> $GITHUB_OUTPUT
+            echo "color=28a745" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ FAILED" >> $GITHUB_OUTPUT
+            echo "color=d73a49" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ steps.status.outputs.status }}';
+            const message = `
+            ## ${status} Production Deployment
+            
+            **Branch:** main
+            **Commit:** ${{ github.sha }}
+            **Triggered by:** ${{ github.actor }}
+            **Time:** ${new Date().toISOString()}
+            
+            **Deploy:** ${{ needs.deploy-production.result }}
+            **Release:** ${{ needs.create-production-release.result }}
+            **Verification:** ${{ needs.post-deploy-verification.result }}
+            `;
+            
+            console.log(message);

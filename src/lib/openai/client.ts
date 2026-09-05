@@ -1,11 +1,27 @@
 import OpenAI from 'openai';
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('Missing OPENAI_API_KEY environment variable');
+let openaiInstance: OpenAI | null = null;
+
+/**
+ * Get OpenAI client instance (lazy initialization)
+ */
+function getOpenAIClient(): OpenAI {
+  if (!openaiInstance) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('Missing OPENAI_API_KEY environment variable');
+    }
+    openaiInstance = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openaiInstance;
 }
 
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// Export for backward compatibility
+export const openai = new Proxy({} as OpenAI, {
+  get(_target, prop) {
+    return (getOpenAIClient() as any)[prop];
+  },
 });
 
 /**
@@ -27,7 +43,7 @@ export async function generateChatCompletion(
     stream = false,
   } = options || {};
 
-  return await openai.chat.completions.create({
+  return await getOpenAIClient().chat.completions.create({
     model,
     messages,
     temperature,
@@ -43,7 +59,7 @@ export async function generateSummary(
   content: string,
   maxLength: number = 150
 ): Promise<string> {
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAIClient().chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
       {
@@ -81,7 +97,7 @@ export async function generateBlogPost(
     long: '2000-3000 words',
   };
 
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAIClient().chat.completions.create({
     model: 'gpt-4o',
     messages: [
       {
@@ -119,7 +135,7 @@ export async function moderateContent(
   categories: any;
   categoryScores: any;
 }> {
-  const response = await openai.moderations.create({
+  const response = await getOpenAIClient().moderations.create({
     input: content,
   });
 
@@ -142,7 +158,7 @@ export async function analyzeSEO(
   suggestions: string[];
   keywords: string[];
 }> {
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAIClient().chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
       {
@@ -179,7 +195,7 @@ export async function generateRecommendations(
   availablePosts: Array<{ id: string; title: string; excerpt: string; tags: string[] }>,
   limit: number = 5
 ): Promise<string[]> {
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAIClient().chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
       {

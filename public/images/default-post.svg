@@ -1,0 +1,14 @@
+<!-- Placeholder SVG for blog posts -->
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0D1117"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="48" fill="#C9D1D9" font-weight="700">
+    Guido Miranda Blog
+  </text>
+  <text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="24" fill="#8B949E">
+    Blog Post Image
+  </text>
+</svg>
